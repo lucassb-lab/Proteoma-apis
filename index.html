@@ -1,23 +1,213 @@
-document.addEventListener("DOMContentLoaded", function() {
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análise Proteómica 3D</title>
+  
+  <!-- Biblioteca 3Dmol.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.4/3Dmol-min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333333;
+      text-align: center;
+      padding-bottom: 40px;
+    }
+
+    /* Menu de Abas Superior */
+    .tab-buttons {
+      display: flex;
+      justify-content: center;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .tab-btn {
+      flex: 1;
+      max-width: 300px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: #666666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: #1fb3a8;
+    }
+
+    .tab-btn.active {
+      color: #1fb3a8;
+      border-bottom: 3px solid #1fb3a8;
+    }
+
+    /* Secções de Conteúdo */
+    .content-section {
+      display: none;
+      padding: 24px 16px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    /* Container do Visualizador 3D */
+    #mol-viewer {
+      width: 100%;
+      height: 520px;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      background-color: #ffffff;
+      margin-top: 16px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    /* Barra de Confiabilidade AlphaFold */
+    .confidence-container {
+      margin-top: 20px;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .confidence-bar {
+      display: flex;
+      height: 12px;
+      width: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 12px 0 8px 0;
+      background-color: #eeeeee;
+    }
+
+    .segment.high { background-color: #1fb3a8; }
+    .segment.moderate { background-color: #e5b23d; }
+    .segment.low { background-color: #9148a4; }
+
+    .confidence-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .label.high { color: #1fb3a8; }
+    .label.moderate { color: #e5b23d; }
+    .label.low { color: #9148a4; }
+
+    /* Frame do Gráfico 3D */
+    .iframe-grafico {
+      width: 100%;
+      height: 550px;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      background-color: #ffffff;
+      margin-top: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menu de Seleção de Abas -->
+  <div class="tab-buttons">
+    <button class="tab-btn active" onclick="switchTab('tab-3d', event)">Proteína 3D</button>
+    <button class="tab-btn" onclick="switchTab('tab-graficos', event)">Gráfico 3D Interativo</button>
+  </div>
+
+  <!-- ABA 1: Proteína 3D -->
+  <div id="tab-3d" class="content-section active">
+    <h2>Vitellogenina (AlphaFold 2)</h2>
+    <p style="font-size: 13px; color: #666666; margin-top: 6px;">Interaja: rode com 1 dedo/rato e faça zoom com 2 dedos/roda do rato.</p>
+    
+    <div id="mol-viewer"></div>
+  </div>
+
+  <!-- ABA 2: Gráfico 3D Interativo -->
+  <div id="tab-graficos" class="content-section">
+    <h2>Confiabilidade dos Modelos</h2>
+    
+    <div class="confidence-container">
+      <div style="font-size: 14px; color: #555555; font-weight: 500;">Distribuição Geral de Métricas</div>
+      <div class="confidence-bar">
+        <div class="segment high" style="width: 39.6%;"></div>
+        <div class="segment moderate" style="width: 31.4%;"></div>
+        <div class="segment low" style="width: 28.9%;"></div>
+      </div>
+      <div class="confidence-labels">
+        <span class="label high">High 2.075 · 39.6%</span>
+        <span class="label moderate">Moderate 1.644 · 31.4%</span>
+        <span class="label low">Low 1.515 · 28.9%</span>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 24px; font-size: 18px;">Visualização Tridimensional das Métricas</h3>
+    <iframe src="grafico_3d.html" class="iframe-grafico"></iframe>
+  </div>
+
+  <script>
+    let viewer = null;
+
+    // Alterna a exibição das abas e recalibra a câmara 3D
+    function switchTab(tabId, evt) {
+      document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+      }
+
+      if (tabId === 'tab-3d' && viewer) {
+        setTimeout(() => {
+          viewer.resize();
+          viewer.render();
+        }, 100);
+      }
+    }
+
+    // Carregamento da estrutura PDB
+    document.addEventListener("DOMContentLoaded", function() {
       let container = document.getElementById('mol-viewer');
       viewer = $3Dmol.createViewer(container, { backgroundColor: 'white' });
 
-      // 1. Coloque o nome EXACTO do seu ficheiro .pdb no GitHub
-      // (Atenção às maiúsculas/minúsculas e se tem "ll" ou "tt")
+      // Verifique se o nome do ficheiro no repositório é 'vitellogenin.pdb' ou 'vittelogenina.pdb'
       let fileName = 'vitellogenin.pdb'; 
 
       fetch(fileName)
         .then(response => {
           if (!response.ok) {
-            throw new Error(`Ficheiro "${fileName}" não encontrado. Verifique o nome exato no GitHub.`);
+            throw new Error(`Ficheiro "${fileName}" não encontrado (Status HTTP ${response.status}). Confirme o nome exato do ficheiro no GitHub.`);
           }
           return response.text();
         })
         .then(data => {
-          // 2. Mudar a especificação de formato para "pdb"
           viewer.addModel(data, "pdb");
           
-          // 3. Estilo com coloração por pLDDT (armazenado no B-factor do PDB)
+          // Aplica coloração por pLDDT (armazenado no B-factor)
           viewer.setStyle({}, {
             cartoon: {
               colorscheme: { prop: 'b', gradient: 'rwb', min: 50, max: 90 }
@@ -29,8 +219,12 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(err => {
           console.error(err);
-          container.innerHTML = `<div style="padding: 20px; color: red; font-weight: bold;">
+          container.innerHTML = `<div style="padding: 40px 20px; color: #d9534f; font-weight: bold; line-height: 1.6;">
             ⚠️ Erro ao carregar a estrutura 3D:<br><br>${err.message}
           </div>`;
         });
     });
+  </script>
+
+</body>
+</html>
