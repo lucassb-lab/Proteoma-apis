@@ -9,16 +9,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.4/3Dmol-min.js"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
       background-color: #f8f9fa;
       color: #333;
       text-align: center;
     }
 
-    /* Menu de Abas no topo */
+    /* Menu de Abas superior */
     .tab-buttons {
       display: flex;
       justify-content: center;
@@ -31,6 +35,7 @@
 
     .tab-btn {
       flex: 1;
+      max-width: 300px;
       padding: 14px;
       font-size: 15px;
       font-weight: bold;
@@ -48,8 +53,8 @@
 
     .content-section {
       display: none;
-      padding: 15px;
-      max-width: 800px;
+      padding: 20px;
+      max-width: 900px;
       margin: auto;
     }
 
@@ -57,13 +62,25 @@
       display: block;
     }
 
-    /* Visualizador 3D da Proteína */
-    #mol-viewer {
+    /* Container do Visualizador 3D Corrigido */
+    .viewer-container {
+      position: relative;
       width: 100%;
-      height: 55vh;
+      height: 60vh;
+      min-height: 420px;
       border: 1px solid #ddd;
       border-radius: 10px;
       background-color: #fff;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+
+    #mol-viewer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     /* Barra de Confiabilidade */
@@ -92,19 +109,20 @@
     .label.moderate { color: #808080; }
     .label.low { color: #7030a0; }
 
-    /* Janela para o Gráfico 3D embutido (iframe) */
     .iframe-grafico {
       width: 100%;
       height: 60vh;
+      min-height: 450px;
       border: 1px solid #ddd;
       border-radius: 10px;
       background-color: #fff;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Menu de Seleção -->
+  <!-- Menu de Navegação -->
   <div class="tab-buttons">
     <button class="tab-btn active" onclick="switchTab('tab-3d')">Proteína 3D</button>
     <button class="tab-btn" onclick="switchTab('tab-graficos')">Gráfico 3D Interativo</button>
@@ -112,16 +130,18 @@
 
   <!-- ABA 1: Proteína 3D -->
   <div id="tab-3d" class="content-section active">
-    <h3>Vitellogenina (AlphaFold 2)</h3>
-    <p style="font-size: 13px; color: #666;">Interaja: rote com 1 dedo e faça zoom com 2 dedos.</p>
-    <div id="mol-viewer"></div>
+    <h2>Vitellogenina (AlphaFold 2)</h2>
+    <p style="font-size: 13px; color: #666; margin-top: 5px;">Interaja: rote com 1 dedo e faça zoom com 2 dedos.</p>
+    
+    <div class="viewer-container">
+      <div id="mol-viewer"></div>
+    </div>
   </div>
 
-  <!-- ABA 2: Gráfico 3D Interativo e Barra de Métrica -->
+  <!-- ABA 2: Gráfico 3D Interativo -->
   <div id="tab-graficos" class="content-section">
-    <h3>Confiabilidade dos Modelos</h3>
+    <h2>Confiabilidade dos Modelos</h2>
     
-    <!-- Barra Segmentada -->
     <div class="confidence-bar">
       <div class="segment high" style="width: 39.6%;"></div>
       <div class="segment moderate" style="width: 31.4%;"></div>
@@ -133,37 +153,51 @@
       <span class="label low">Low 1.515 (28.9%)</span>
     </div>
 
-    <!-- Gráfico 3D carregado via HTML -->
-    <h3>Distribuição de Métricas (3D)</h3>
-    <p style="font-size: 13px; color: #666;">Gire e navegue pelos pontos do gráfico abaixo:</p>
-    
-    <!-- Mude "grafico_3d.html" para o nome EXATO do arquivo HTML do seu gráfico -->
+    <h3 style="margin-top: 20px;">Distribuição de Métricas (3D)</h3>
     <iframe src="grafico_3d.html" class="iframe-grafico"></iframe>
   </div>
 
   <script>
-    // Função para alternar entre as abas
+    let viewer = null;
+
+    // Função para alternar abas e recalcular tamanho do canvas 3D
     function switchTab(tabId) {
       document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       
       document.getElementById(tabId).classList.add('active');
       event.currentTarget.classList.add('active');
+
+      if (tabId === 'tab-3d' && viewer) {
+        setTimeout(() => {
+          viewer.resize();
+          viewer.render();
+        }, 100);
+      }
     }
 
-    // Carregar o PDB da proteína
+    // Inicialização da molécula 3D
     document.addEventListener("DOMContentLoaded", function() {
       let element = document.getElementById('mol-viewer');
-      let viewer = $3Dmol.createViewer(element, { backgroundColor: 'white' });
+      viewer = $3Dmol.createViewer(element, { backgroundColor: 'white' });
 
-      fetch('vitellogenin.pdb')
-        .then(response => response.text())
+      fetch('vitellogenin.cif')
+        .then(response => {
+          if (!response.ok) throw new Error("Ficheiro vitellogenin.cif não encontrado");
+          return response.text();
+        })
         .then(data => {
-          viewer.addModel(data, "pdb");
-          viewer.setStyle({}, { cartoon: { colorscheme: { prop: 'b', gradient: 'rwb', min: 50, max: 90 } } });
+          viewer.addModel(data, "cif");
+          viewer.setStyle({}, {
+            cartoon: {
+              colorscheme: { prop: 'b', gradient: 'rwb', min: 50, max: 90 }
+            }
+          });
           viewer.zoomTo();
           viewer.render();
-        });
+          viewer.resize();
+        })
+        .catch(err => console.error("Erro ao carregar a estrutura:", err));
     });
   </script>
 
