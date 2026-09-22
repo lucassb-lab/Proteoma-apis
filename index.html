@@ -128,6 +128,31 @@
       margin-top: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
+
+    /* Ajustes de responsividade para ecrãs móveis */
+    @media (max-width: 600px) {
+      .content-section {
+        padding: 12px 6px;
+      }
+
+      .confidence-container {
+        padding: 10px;
+      }
+
+      .confidence-labels {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+        font-size: 11px;
+      }
+
+      .iframe-grafico {
+        width: 100%;
+        height: 480px;
+        border: none;
+        border-radius: 8px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -194,7 +219,6 @@
       let container = document.getElementById('mol-viewer');
       viewer = $3Dmol.createViewer(container, { backgroundColor: 'white' });
 
-      // Verifique se o nome do ficheiro no repositório é 'vitellogenin.pdb' ou 'vittelogenina.pdb'
       let fileName = 'vitellogenin.pdb'; 
 
       fetch(fileName)
@@ -210,7 +234,7 @@
           // Aplica coloração por pLDDT (armazenado no B-factor)
           viewer.setStyle({}, {
             cartoon: {
-              colorscheme: { prop: 'b', gradient: 'rwb', min: 50, max: 90 }
+              colorscheme: { prop: 'b', gradient: 'roygb', min: 50, max: 90 }
             }
           });
           
