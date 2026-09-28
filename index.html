@@ -73,15 +73,8 @@
 
     .content-section h2 {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
       color: #222222;
-    }
-
-    .subtitle {
-      text-align: center;
-      font-size: 13px;
-      color: #666666;
-      margin-bottom: 20px;
     }
 
     /* Estilos do Guia do Pôster */
@@ -137,7 +130,7 @@
     }
 
     .guide-text li {
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .highlight-box {
@@ -257,7 +250,6 @@
   <!-- ABA 1: Guia de Apresentação do Pôster -->
   <div id="tab-guia" class="content-section active">
     <h2>Guia Interativo de Apresentação</h2>
-    <p class="subtitle">Acompanhe a explicação detalhada dos dados e resultados apresentados no pôster.</p>
 
     <div class="guide-container">
       
@@ -271,9 +263,29 @@
         </div>
       </div>
 
-      <!-- Cartão 2: Pipeline HPC -->
+      <!-- Cartão 2: As Métricas do AlphaFold2 -->
       <div class="guide-card">
-        <div class="guide-step">Passo 02 · Infraestrutura</div>
+        <div class="guide-step">Passo 02 · Métricas do AlphaFold2</div>
+        <div class="guide-title">Entendendo os Indicadores de Qualidade</div>
+        <div class="guide-text">
+          Para avaliar cada modelo gerado, utilizamos as métricas fornecidas pelo ColabFold/AlphaFold2:
+          <ul>
+            <li>
+              <b>pLDDT (predicted Local Distance Difference Test):</b> Avalia a confiança <i>local</i> na posição de cada resíduo de aminoácido (escala de 0 a 100). Usamos o <b>pLDDT médio</b> para resumir a qualidade da cadeia inteira em um único valor. Contudo, por ser uma métrica estritamente local, o pLDDT médio sozinho não garante a correta orientação espacial entre domínios distantes.
+            </li>
+            <li>
+              <b>pTM (predicted TM-score):</b> Avalia a acurácia do <i>dobramento e da topologia global</i> da proteína (escala de 0 a 1). Valores &ge; 0,5 indicam que a estrutura tridimensional completa possui uma topologia altamente confiável.
+            </li>
+            <li>
+              <b>PAE (Predicted Aligned Error):</b> Mede o erro estimado de posição relativa (em Ångströms) entre pares de resíduos. O <b>PAE médio</b> reflete a incerteza de alinhamento global entre domínios, enquanto o <b>PAE máximo</b> capta o pior erro pontual (frequentemente associado a alças flexíveis ou extremidades desordenadas).
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Cartão 3: Pipeline HPC -->
+      <div class="guide-card">
+        <div class="guide-step">Passo 03 · Infraestrutura</div>
         <div class="guide-title">Pipeline de Alta Performance em HPC</div>
         <div class="guide-text">
           Desenvolvemos um fluxo de trabalho automatizado em ambiente de HPC baseado em <b>LocalColabFold/AlphaFold2</b> num contêiner Singularity próprio. 
@@ -281,12 +293,11 @@
         </div>
       </div>
 
-      <!-- Cartão 3: Critério Integrado -->
+      <!-- Cartão 4: Critério Integrado -->
       <div class="guide-card">
-        <div class="guide-step">Passo 03 · Avaliação Multicritério</div>
+        <div class="guide-step">Passo 04 · Avaliação Multicritério</div>
         <div class="guide-title">Por que Superar o pLDDT Isolado?</div>
         <div class="guide-text">
-          O pLDDT mede apenas a confiança local do esqueleto peptídico, mas ignora a orientação global entre domínios. 
           Ao integrar simultaneamente <b>pLDDT (&ge;70)</b>, <b>pTM (&ge;0,5)</b> e <b>PAE médio (&le;21,2 Å)</b>:
           <ul>
             <li><b>381 modelos (15,5%)</b> que seriam aceites apenas pelo pLDDT falharam em métricas globais e foram reclassificados.</li>
@@ -295,9 +306,9 @@
         </div>
       </div>
 
-      <!-- Cartão 4: PCA -->
+      <!-- Cartão 5: PCA -->
       <div class="guide-card accent">
-        <div class="guide-step">Passo 04 · Validação Estatística</div>
+        <div class="guide-step">Passo 05 · Validação Estatística</div>
         <div class="guide-title">Análise de Componentes Principais (PCA)</div>
         <div class="guide-text">
           A PCA sobre as métricas padronizadas provou que a variância dos dados (93,8% explicada) é regida por dois eixos com papéis biológicos claros:
@@ -311,9 +322,9 @@
         </div>
       </div>
 
-      <!-- Cartão 5: Conclusão -->
+      <!-- Cartão 6: Conclusão -->
       <div class="guide-card">
-        <div class="guide-step">Passo 05 · Impacto</div>
+        <div class="guide-step">Passo 06 · Impacto</div>
         <div class="guide-title">Conclusão e Aplicações Futuras</div>
         <div class="guide-text">
           Este estudo entrega um protocolo reprodutível em HPC e um arcabouço rigoroso para priorizar modelos estruturais confiáveis. Esse conjunto filtrado de estruturas servirá como base segura para simulações de acoplamento molecular (<i>docking</i>) e estudos funcionais em <i>Apis mellifera</i> e outros proteomas de insetos.
@@ -326,15 +337,12 @@
   <!-- ABA 2: Proteína 3D -->
   <div id="tab-3d" class="content-section">
     <h2>Vitellogenina (AlphaFold 2)</h2>
-    <p class="subtitle">Interaja: rode com 1 dedo/rato e faça zoom com 2 dedos/roda do rato.</p>
-    
     <div id="mol-viewer"></div>
   </div>
 
   <!-- ABA 3: Gráfico 3D Interativo -->
   <div id="tab-graficos" class="content-section">
     <h2>Confiabilidade dos Modelos</h2>
-    <p class="subtitle">Distribuição tridimensional das métricas de confiabilidade no proteoma.</p>
     
     <div class="confidence-container">
       <div style="font-size: 14px; color: #555555; font-weight: 500;">Distribuição Geral de Métricas</div>
