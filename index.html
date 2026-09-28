@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Análise Proteómica 3D</title>
+  <title>Análise Proteómica 3D - Apis mellifera</title>
   
   <!-- Biblioteca 3Dmol.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.0.4/3Dmol-min.js"></script>
@@ -37,9 +37,9 @@
 
     .tab-btn {
       flex: 1;
-      max-width: 300px;
-      padding: 16px;
-      font-size: 15px;
+      max-width: 220px;
+      padding: 14px 8px;
+      font-size: 14px;
       font-weight: 600;
       border: none;
       background: none;
@@ -64,10 +64,90 @@
       padding: 24px 16px;
       max-width: 900px;
       margin: auto;
+      text-align: left;
     }
 
     .content-section.active {
       display: block;
+    }
+
+    .content-section h2 {
+      text-align: center;
+      margin-bottom: 8px;
+      color: #222222;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #666666;
+      margin-bottom: 20px;
+    }
+
+    /* Estilos do Guia do Pôster */
+    .guide-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .guide-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-left: 5px solid #1fb3a8;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .guide-card.accent {
+      border-left-color: #5d2e5d;
+    }
+
+    .guide-step {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #1fb3a8;
+      margin-bottom: 4px;
+    }
+
+    .guide-card.accent .guide-step {
+      color: #5d2e5d;
+    }
+
+    .guide-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #222222;
+      margin-bottom: 10px;
+    }
+
+    .guide-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #444444;
+    }
+
+    .guide-text ul {
+      margin-top: 8px;
+      padding-left: 20px;
+    }
+
+    .guide-text li {
+      margin-bottom: 6px;
+    }
+
+    .highlight-box {
+      background-color: #f0fdfb;
+      border: 1px solid #bcece7;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #0e625c;
     }
 
     /* Container do Visualizador 3D */
@@ -91,6 +171,7 @@
       border-radius: 12px;
       border: 1px solid #e0e0e0;
       box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      text-align: center;
     }
 
     .confidence-bar {
@@ -131,8 +212,17 @@
 
     /* Ajustes de responsividade para ecrãs móveis */
     @media (max-width: 600px) {
+      .tab-btn {
+        font-size: 12px;
+        padding: 12px 4px;
+      }
+
       .content-section {
-        padding: 12px 6px;
+        padding: 16px 10px;
+      }
+
+      .guide-card {
+        padding: 14px 14px;
       }
 
       .confidence-container {
@@ -159,21 +249,92 @@
 
   <!-- Menu de Seleção de Abas -->
   <div class="tab-buttons">
-    <button class="tab-btn active" onclick="switchTab('tab-3d', event)">Proteína 3D</button>
+    <button class="tab-btn active" onclick="switchTab('tab-guia', event)">Guia do Pôster</button>
+    <button class="tab-btn" onclick="switchTab('tab-3d', event)">Proteína 3D</button>
     <button class="tab-btn" onclick="switchTab('tab-graficos', event)">Gráfico 3D Interativo</button>
   </div>
 
-  <!-- ABA 1: Proteína 3D -->
-  <div id="tab-3d" class="content-section active">
+  <!-- ABA 1: Guia de Apresentação do Pôster -->
+  <div id="tab-guia" class="content-section active">
+    <h2>Guia Interativo de Apresentação</h2>
+    <p class="subtitle">Acompanhe a explicação detalhada dos dados e resultados apresentados no pôster.</p>
+
+    <div class="guide-container">
+      
+      <!-- Cartão 1: Motivação -->
+      <div class="guide-card">
+        <div class="guide-step">Passo 01 · Contexto &amp; Motivação</div>
+        <div class="guide-title">O Desafio no Proteoma de <i>Apis mellifera</i></div>
+        <div class="guide-text">
+          O declínio populacional das abelhas devido a patógenos e defensivos agrícolas exige a compreensão detalhada das suas proteínas em 3D para estudos de <i>docking</i> e função molecular. 
+          Embora o AlphaFold2 permita a predição massiva, <b>não existe consenso na literatura sobre como validar a qualidade dessas estruturas</b> em organismos não-modelo, sendo comum o uso simplificado de uma única métrica (pLDDT).
+        </div>
+      </div>
+
+      <!-- Cartão 2: Pipeline HPC -->
+      <div class="guide-card">
+        <div class="guide-step">Passo 02 · Infraestrutura</div>
+        <div class="guide-title">Pipeline de Alta Performance em HPC</div>
+        <div class="guide-text">
+          Desenvolvemos um fluxo de trabalho automatizado em ambiente de HPC baseado em <b>LocalColabFold/AlphaFold2</b> num contêiner Singularity próprio. 
+          O pipeline processa <b>23.470 isoformas</b> de proteínas (RefSeq) a partir dos 9.993 genes do genoma <i>Amel_HAv3.1</i>, com o cálculo de alinhamentos múltiplos de sequências (MSA) executado de forma independente antes da predição.
+        </div>
+      </div>
+
+      <!-- Cartão 3: Critério Integrado -->
+      <div class="guide-card">
+        <div class="guide-step">Passo 03 · Avaliação Multicritério</div>
+        <div class="guide-title">Por que Superar o pLDDT Isolado?</div>
+        <div class="guide-text">
+          O pLDDT mede apenas a confiança local do esqueleto peptídico, mas ignora a orientação global entre domínios. 
+          Ao integrar simultaneamente <b>pLDDT (&ge;70)</b>, <b>pTM (&ge;0,5)</b> e <b>PAE médio (&le;21,2 Å)</b>:
+          <ul>
+            <li><b>381 modelos (15,5%)</b> que seriam aceites apenas pelo pLDDT falharam em métricas globais e foram reclassificados.</li>
+            <li>O proteoma foi dividido em: <b>39,6% Alta</b>, <b>31,4% Moderada</b> e <b>28,9% Baixa confiabilidade</b>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Cartão 4: PCA -->
+      <div class="guide-card accent">
+        <div class="guide-step">Passo 04 · Validação Estatística</div>
+        <div class="guide-title">Análise de Componentes Principais (PCA)</div>
+        <div class="guide-text">
+          A PCA sobre as métricas padronizadas provou que a variância dos dados (93,8% explicada) é regida por dois eixos com papéis biológicos claros:
+          <ul>
+            <li><b>PC1 (68,8% da variância) — Qualidade Global:</b> Impulsionada de forma integrada pelo PAE médio (34,3%), pLDDT (31,7%) e pTM (31,6%).</li>
+            <li><b>PC2 (24,7% da variância) — Desordem Local:</b> Dominada pelo PAE máximo (94,1%), isolando caudas flexíveis e alças desordenadas.</li>
+          </ul>
+          <div class="highlight-box">
+            💡 <b>Dica:</b> Aceda à aba <b>"Gráfico 3D Interativo"</b> para explorar a dispersão das proteínas ao longo desses eixos em tempo real.
+          </div>
+        </div>
+      </div>
+
+      <!-- Cartão 5: Conclusão -->
+      <div class="guide-card">
+        <div class="guide-step">Passo 05 · Impacto</div>
+        <div class="guide-title">Conclusão e Aplicações Futuras</div>
+        <div class="guide-text">
+          Este estudo entrega um protocolo reprodutível em HPC e um arcabouço rigoroso para priorizar modelos estruturais confiáveis. Esse conjunto filtrado de estruturas servirá como base segura para simulações de acoplamento molecular (<i>docking</i>) e estudos funcionais em <i>Apis mellifera</i> e outros proteomas de insetos.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ABA 2: Proteína 3D -->
+  <div id="tab-3d" class="content-section">
     <h2>Vitellogenina (AlphaFold 2)</h2>
-    <p style="font-size: 13px; color: #666666; margin-top: 6px;">Interaja: rode com 1 dedo/rato e faça zoom com 2 dedos/roda do rato.</p>
+    <p class="subtitle">Interaja: rode com 1 dedo/rato e faça zoom com 2 dedos/roda do rato.</p>
     
     <div id="mol-viewer"></div>
   </div>
 
-  <!-- ABA 2: Gráfico 3D Interativo -->
+  <!-- ABA 3: Gráfico 3D Interativo -->
   <div id="tab-graficos" class="content-section">
     <h2>Confiabilidade dos Modelos</h2>
+    <p class="subtitle">Distribuição tridimensional das métricas de confiabilidade no proteoma.</p>
     
     <div class="confidence-container">
       <div style="font-size: 14px; color: #555555; font-weight: 500;">Distribuição Geral de Métricas</div>
@@ -189,14 +350,14 @@
       </div>
     </div>
 
-    <h3 style="margin-top: 24px; font-size: 18px;">Visualização Tridimensional das Métricas</h3>
+    <h3 style="margin-top: 24px; font-size: 18px; text-align: center;">Visualização Tridimensional das Métricas</h3>
     <iframe src="grafico_3d_interativo.html" class="iframe-grafico"></iframe>
   </div>
 
   <script>
     let viewer = null;
 
-    // Alterna a exibição das abas e recalibra a câmara 3D
+    // Alterna a exibição das abas e recalibra a câmara 3D quando necessário
     function switchTab(tabId, evt) {
       document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -214,7 +375,7 @@
       }
     }
 
-    // Carregamento da estrutura PDB
+    // Carregamento da estrutura PDB na aba 3D
     document.addEventListener("DOMContentLoaded", function() {
       let container = document.getElementById('mol-viewer');
       viewer = $3Dmol.createViewer(container, { backgroundColor: 'white' });
@@ -243,7 +404,7 @@
         })
         .catch(err => {
           console.error(err);
-          container.innerHTML = `<div style="padding: 40px 20px; color: #d9534f; font-weight: bold; line-height: 1.6;">
+          container.innerHTML = `<div style="padding: 40px 20px; color: #d9534f; font-weight: bold; line-height: 1.6; text-align: center;">
             ⚠️ Erro ao carregar a estrutura 3D:<br><br>${err.message}
           </div>`;
         });
